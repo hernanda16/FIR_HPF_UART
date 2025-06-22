@@ -1,0 +1,52 @@
+# Quartus II generated files
+*.rpt
+*.summary
+*.qpf
+*.qsf
+*.qws
+*.qarlog
+*.qar
+
+# Quartus compilation database
+db/
+incremental_db/
+
+# Quartus output files
+output_files/
+
+# Quartus simulation files
+simulation/
+*.vcd
+*.wlf
+
+# Quartus timing files
+*.sta.rpt
+*.tan.rpt
+
+# Quartus fitter files
+*.fit.rpt
+*.fit.summary
+
+# Quartus assembler files
+*.asm.rpt
+
+# Quartus programming files
+*.sof
+*.pof
+*.rbf
+*.ttf
+
+# Quartus pin assignment files
+*.pin
+
+# Quartus temporary files
+*.bak
+*.tmp
+*~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Generated HDL files
+ADC
