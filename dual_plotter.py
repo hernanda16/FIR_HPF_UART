@@ -7,9 +7,9 @@ import numpy as np
 import time
 
 # --------- Config ---------
-SERIAL_PORT = 'COM8'
-BAUD_RATE = 500000
-SAMPLES_TO_SHOW = 500       # Jumlah sampel yang ditampilkan
+SERIAL_PORT = 'COM3'
+BAUD_RATE = 2000000
+SAMPLES_TO_SHOW = 250       # Jumlah sampel yang ditampilkan
 UPDATE_INTERVAL = 50        # ms - interval update plot
 TRIGGER_LEVEL = 2048        # Level trigger (setengah dari 4096)
 TRIGGER_SLOPE = 'rising'    # 'rising' atau 'falling'

@@ -97,49 +97,49 @@ begin
         signal_buffer(2) <= signal_buffer(1);
         signal_buffer(1) <= signal_buffer(0);
         signal_buffer(0) <= std_logic_vector(signed(INPUT_ADC) + to_signed(2048, 12));
-
-        -- FIR calculation
-        fir_output <= std_logic_vector(
-                signed(signal_buffer(0)) * coeffs(0) + 
-                signed(signal_buffer(1)) * coeffs(1) +
-                signed(signal_buffer(2)) * coeffs(2) +
-                signed(signal_buffer(3)) * coeffs(3) +
-                signed(signal_buffer(4)) * coeffs(4) +
-                signed(signal_buffer(5)) * coeffs(5) +
-                signed(signal_buffer(6)) * coeffs(6) +
-                signed(signal_buffer(7)) * coeffs(7) +
-                signed(signal_buffer(8)) * coeffs(8) +
-                signed(signal_buffer(9)) * coeffs(9) +
-                signed(signal_buffer(10)) * coeffs(10) +
-                signed(signal_buffer(11)) * coeffs(11) +
-                signed(signal_buffer(12)) * coeffs(12) +
-                signed(signal_buffer(13)) * coeffs(13) +
-                signed(signal_buffer(14)) * coeffs(14) +
-                signed(signal_buffer(15)) * coeffs(15) +
-                signed(signal_buffer(16)) * coeffs(16) +
-                signed(signal_buffer(17)) * coeffs(17) +
-                signed(signal_buffer(18)) * coeffs(18) +
-                signed(signal_buffer(19)) * coeffs(19) +
-                signed(signal_buffer(20)) * coeffs(20) +
-                signed(signal_buffer(21)) * coeffs(21) +
-                signed(signal_buffer(22)) * coeffs(22) +
-                signed(signal_buffer(23)) * coeffs(23) +
-                signed(signal_buffer(24)) * coeffs(24) +
-                signed(signal_buffer(25)) * coeffs(25) +
-                signed(signal_buffer(26)) * coeffs(26) +
-                signed(signal_buffer(27)) * coeffs(27) +
-                signed(signal_buffer(28)) * coeffs(28) +
-                signed(signal_buffer(29)) * coeffs(29) +
-                signed(signal_buffer(30)) * coeffs(30) +
-                signed(signal_buffer(31)) * coeffs(31) +
-                signed(signal_buffer(32)) * coeffs(32) +
-                signed(signal_buffer(33)) * coeffs(33) +
-                signed(signal_buffer(34)) * coeffs(34) +
-                signed(signal_buffer(35)) * coeffs(35) +
-                signed(signal_buffer(36)) * coeffs(36));
       end if;     
     end if;
   end process;
+
+  -- FIR calculation
+  fir_output <= std_logic_vector(
+          signed(signal_buffer(0)) * coeffs(0) + 
+          signed(signal_buffer(1)) * coeffs(1) +
+          signed(signal_buffer(2)) * coeffs(2) +
+          signed(signal_buffer(3)) * coeffs(3) +
+          signed(signal_buffer(4)) * coeffs(4) +
+          signed(signal_buffer(5)) * coeffs(5) +
+          signed(signal_buffer(6)) * coeffs(6) +
+          signed(signal_buffer(7)) * coeffs(7) +
+          signed(signal_buffer(8)) * coeffs(8) +
+          signed(signal_buffer(9)) * coeffs(9) +
+          signed(signal_buffer(10)) * coeffs(10) +
+          signed(signal_buffer(11)) * coeffs(11) +
+          signed(signal_buffer(12)) * coeffs(12) +
+          signed(signal_buffer(13)) * coeffs(13) +
+          signed(signal_buffer(14)) * coeffs(14) +
+          signed(signal_buffer(15)) * coeffs(15) +
+          signed(signal_buffer(16)) * coeffs(16) +
+          signed(signal_buffer(17)) * coeffs(17) +
+          signed(signal_buffer(18)) * coeffs(18) +
+          signed(signal_buffer(19)) * coeffs(19) +
+          signed(signal_buffer(20)) * coeffs(20) +
+          signed(signal_buffer(21)) * coeffs(21) +
+          signed(signal_buffer(22)) * coeffs(22) +
+          signed(signal_buffer(23)) * coeffs(23) +
+          signed(signal_buffer(24)) * coeffs(24) +
+          signed(signal_buffer(25)) * coeffs(25) +
+          signed(signal_buffer(26)) * coeffs(26) +
+          signed(signal_buffer(27)) * coeffs(27) +
+          signed(signal_buffer(28)) * coeffs(28) +
+          signed(signal_buffer(29)) * coeffs(29) +
+          signed(signal_buffer(30)) * coeffs(30) +
+          signed(signal_buffer(31)) * coeffs(31) +
+          signed(signal_buffer(32)) * coeffs(32) +
+          signed(signal_buffer(33)) * coeffs(33) +
+          signed(signal_buffer(34)) * coeffs(34) +
+          signed(signal_buffer(35)) * coeffs(35) +
+          signed(signal_buffer(36)) * coeffs(36));
 
   OUTPUT_ADC <= std_logic_vector(signed(fir_output(26 downto 15)) + 2048);
 end rtl;

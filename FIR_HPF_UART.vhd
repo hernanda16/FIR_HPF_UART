@@ -12,7 +12,7 @@ entity FIR_HPF_UART is
 end FIR_HPF_UART;
 
 architecture RTL of FIR_HPF_UART is
-  constant CLKS_PER_BIT : integer := 100;
+  constant CLKS_PER_BIT : integer := 25;
 
   constant SAMPLE_CLOCK_DIV : integer := 2500;
   signal sample_clock_counter : integer range 0 to SAMPLE_CLOCK_DIV-1 := 0;
@@ -33,7 +33,6 @@ architecture RTL of FIR_HPF_UART is
   signal adc_ch0_sampled : std_logic_vector(11 downto 0);
   signal adc_filtered_sampled : std_logic_vector(11 downto 0);
   
-  -- Derived signals for high and low bytes
   signal tx_high : std_logic_vector(7 downto 0);
   signal tx_low  : std_logic_vector(7 downto 0);
   
@@ -71,7 +70,7 @@ architecture RTL of FIR_HPF_UART is
       CLK_50     : in  std_logic;
       INPUT_ADC  : in  std_logic_vector(11 downto 0);
       OUTPUT_ADC : out std_logic_vector(11 downto 0);
-      EN         : in  std_logic := '0'  -- Enable input
+      EN         : in  std_logic := '0'
     );
   end component;
 
@@ -89,13 +88,12 @@ architecture RTL of FIR_HPF_UART is
   end component;
 
 begin
-
-  -- Show ADC data on LEDs (top 8 bits of 12-bit ADC)
+  -- Debug LEDR output
   LEDR <= adc_ch0_sampled(11 downto 4);
   
   U_ADC : ADC
     port map (
-      CLOCK => CLK_50,        -- Gunakan clock 50 MHz langsung
+      CLOCK => CLK_50,
       CH0   => adc_ch0,
       CH1   => open,
       CH2   => open,
@@ -122,7 +120,7 @@ begin
 
     U_FIR_HPF : FIR_HPF
     port map (
-      CLK_50 => CLK_50,       -- FIR tetap menggunakan 50 MHz
+      CLK_50 => CLK_50,
       INPUT_ADC => adc_ch0, 
       OUTPUT_ADC => adc_filtered,
       EN => sample_enable
@@ -132,15 +130,15 @@ begin
     port map (
       CLOCK     => CLK_50,
       RESET     => RESET,
-      DATA0     => adc_ch0,     -- Gunakan data yang sudah di-sample
-      DATA1     => adc_filtered, -- Gunakan data filtered yang sudah di-sample
+      DATA0     => adc_ch0,    
+      DATA1     => adc_filtered,
       TX_DV     => tx_dv,
       TX_BYTE   => tx_byte,
       TX_DONE   => tx_done,
       TX_ACTIVE => tx_active
     );
 
-  -- Clock divider process untuk menghasilkan sample enable 20 kHz
+  -- Clock Divider Sampling
   process(CLK_50, RESET)
   begin
     if rising_edge(CLK_50) then
@@ -151,7 +149,7 @@ begin
         sample_enable <= '0';
         if sample_clock_counter = SAMPLE_CLOCK_DIV-1 then
           sample_clock_counter <= 0;
-          sample_enable <= '1';  -- Generate pulse setiap 2500 clock cycles (20 kHz)
+          sample_enable <= '1';
         else
           sample_clock_counter <= sample_clock_counter + 1;
         end if;
