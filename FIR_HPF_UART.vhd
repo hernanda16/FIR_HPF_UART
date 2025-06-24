@@ -17,7 +17,6 @@ architecture RTL of FIR_HPF_UART is
   constant SAMPLE_CLOCK_DIV : integer := 2500;
   signal sample_clock_counter : integer range 0 to SAMPLE_CLOCK_DIV-1 := 0;
   signal sample_enable : std_logic := '0';
-  signal adc_clk : std_logic := '0';
 
   type state_type is (STATE_0, STATE_1, STATE_2, STATE_3);
   signal state : state_type := STATE_0;
@@ -71,7 +70,8 @@ architecture RTL of FIR_HPF_UART is
     port (
       CLK_50     : in  std_logic;
       INPUT_ADC  : in  std_logic_vector(11 downto 0);
-      OUTPUT_ADC : out std_logic_vector(11 downto 0)
+      OUTPUT_ADC : out std_logic_vector(11 downto 0);
+      EN         : in  std_logic := '0'  -- Enable input
     );
   end component;
 
@@ -120,19 +120,20 @@ begin
       o_Tx_Done   => tx_done
     );
 
-  U_FIR_HPF : FIR_HPF
+    U_FIR_HPF : FIR_HPF
     port map (
-      CLK_50 => adc_clk,       -- FIR tetap menggunakan 50 MHz
+      CLK_50 => CLK_50,       -- FIR tetap menggunakan 50 MHz
       INPUT_ADC => adc_ch0, 
-      OUTPUT_ADC => adc_filtered 
+      OUTPUT_ADC => adc_filtered,
+      EN => sample_enable
     );
 
   U_FRAMING : FRAMING
     port map (
       CLOCK     => CLK_50,
       RESET     => RESET,
-      DATA0     => adc_ch0_sampled,     -- Gunakan data yang sudah di-sample
-      DATA1     => adc_filtered_sampled, -- Gunakan data filtered yang sudah di-sample
+      DATA0     => adc_ch0,     -- Gunakan data yang sudah di-sample
+      DATA1     => adc_filtered, -- Gunakan data filtered yang sudah di-sample
       TX_DV     => tx_dv,
       TX_BYTE   => tx_byte,
       TX_DONE   => tx_done,
@@ -140,40 +141,21 @@ begin
     );
 
   -- Clock divider process untuk menghasilkan sample enable 20 kHz
-  process(CLK_50)
+  process(CLK_50, RESET)
   begin
     if rising_edge(CLK_50) then
       if RESET = '0' then
         sample_clock_counter <= 0;
         sample_enable <= '0';
-        adc_clk <= '0';
       else
+        sample_enable <= '0';
         if sample_clock_counter = SAMPLE_CLOCK_DIV-1 then
           sample_clock_counter <= 0;
           sample_enable <= '1';  -- Generate pulse setiap 2500 clock cycles (20 kHz)
-          adc_clk <= not adc_clk;  -- Toggle adc_clk to create 20kHz clock
         else
           sample_clock_counter <= sample_clock_counter + 1;
-          sample_enable <= '0';
         end if;
       end if;
     end if;
   end process;
-
-  -- Sampling process untuk capture data pada 20 kHz rate
-  process(CLK_50)
-  begin
-    if rising_edge(CLK_50) then
-      if RESET = '0' then
-        adc_ch0_sampled <= (others => '0');
-        adc_filtered_sampled <= (others => '0');
-      else
-        if sample_enable = '1' then
-          adc_ch0_sampled <= adc_ch0;           -- Sample raw ADC data
-          adc_filtered_sampled <= adc_filtered; -- Sample filtered data
-        end if;
-      end if;
-    end if;
-  end process;
-
 end RTL;
