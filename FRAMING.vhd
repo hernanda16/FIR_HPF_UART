@@ -23,7 +23,7 @@ architecture RTL of FRAMING is
     signal tx_dv_reg        : std_logic := '0';
     signal byte_to_send     : std_logic_vector(7 downto 0);
     signal delay_counter    : integer := 0;
-    constant interframe_delay : integer := 50_000; -- 1ms @ 50MHz
+    constant interframe_delay : integer := 0; -- 1ms @ 50MHz
     signal adc_data0_reg    : std_logic_vector(11 downto 0);
     signal adc_data1_reg    : std_logic_vector(11 downto 0);
     signal tx_done_prev     : std_logic := '0';

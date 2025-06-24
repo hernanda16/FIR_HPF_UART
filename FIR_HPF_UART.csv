@@ -1,0 +1,33 @@
+# Copyright (C) 2020  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+
+# Quartus Prime Version 20.1.0 Build 711 06/05/2020 SJ Lite Edition
+# File: D:\FPGA\Quartus\Final_Project\FIR_HPF_UART.csv
+# Generated on: Tue Jun 24 18:47:07 2025
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus Prime software.
+
+To,Direction,Location,I/O Bank,VREF Group,I/O Standard,Reserved,Current Strength,Slew Rate,Differential Pair,Strict Preservation
+UART_OUT,Unknown,PIN_V5,3,B3_N0,,,,,,
+LEDR[0],Unknown,PIN_A8,7,B7_N0,,,,,,
+LEDR[1],Unknown,PIN_A9,7,B7_N0,,,,,,
+CLK_50,Unknown,PIN_P11,3,B3_N0,,,,,,
+RESET,Unknown,PIN_C10,7,B7_N0,,,,,,
+LEDR[2],Unknown,PIN_A10,7,B7_N0,,,,,,
+LEDR[3],Unknown,PIN_B10,7,B7_N0,,,,,,
+LEDR[4],Unknown,PIN_D13,7,B7_N0,,,,,,
+LEDR[5],Unknown,PIN_C13,7,B7_N0,,,,,,
+LEDR[6],Unknown,PIN_E14,7,B7_N0,,,,,,
+LEDR[7],Unknown,PIN_D14,7,B7_N0,,,,,,
