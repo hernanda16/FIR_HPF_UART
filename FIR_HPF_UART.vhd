@@ -26,6 +26,7 @@ architecture RTL of FIR_HPF_UART is
   signal interbyte_counter : integer range 0 to 2500 := 0;
   
   signal adc_ch0 : std_logic_vector(11 downto 0);
+  signal adc_filtered : std_logic_vector(11 downto 0);
   signal adc_data_latched : std_logic_vector(11 downto 0);
   
   -- Derived signals for high and low bytes
@@ -61,6 +62,27 @@ architecture RTL of FIR_HPF_UART is
     );
   end component;
 
+  component FIR_HPF
+    port (
+      CLK_50     : in  std_logic;
+      INPUT_ADC  : in  std_logic_vector(11 downto 0);
+      OUTPUT_ADC : out std_logic_vector(11 downto 0)
+    );
+  end component;
+
+  component FRAMING
+    port (
+      CLOCK     : in  std_logic;
+      RESET     : in  std_logic;
+      DATA0     : in  std_logic_vector(11 downto 0);
+      DATA1     : in  std_logic_vector(11 downto 0);
+      TX_DV     : out std_logic;
+      TX_BYTE   : out std_logic_vector(7 downto 0);
+      TX_DONE   : in  std_logic;
+      TX_ACTIVE : in  std_logic
+    );
+  end component;
+
 begin
 
   -- Show ADC data on LEDs (top 8 bits of 12-bit ADC, similar to Verilog [11:2] but adjusted for 8 LEDs)
@@ -93,54 +115,73 @@ begin
       o_Tx_Done   => tx_done
     );
 
-  -- Byte splitting logic (same as Verilog)
-  tx_high <= adc_data_latched(11 downto 4);
-  tx_low  <= adc_data_latched(3 downto 0) & "0000";
+  U_FIR_HPF : FIR_HPF
+    port map (
+      CLK_50 => CLK_50,
+      INPUT_ADC => adc_ch0, 
+      OUTPUT_ADC => adc_filtered 
+    );
 
-  process(CLK_50)
-  begin
-    if rising_edge(CLK_50) then
-      if RESET = '0' then
-        state         <= STATE_0;
-        tx_dv         <= '0';
-        tx_byte       <= x"00";
-        interbyte_counter <= 0;
-      else
-        case state is
-          when STATE_0 =>
-            if tx_active = '0' then
-              adc_data_latched <= adc_ch0;  -- Latch current ADC data
-              tx_byte <= tx_high;           -- Prepare high byte
-              tx_dv <= '1';
-              state <= STATE_1;
-            end if;
+  U_FRAMING : FRAMING
+    port map (
+      CLOCK     => CLK_50,
+      RESET     => RESET,
+      DATA0     => adc_ch0,  -- Use filtered ADC data
+      DATA1     => adc_filtered,  -- No second channel used
+      TX_DV     => tx_dv,
+      TX_BYTE   => tx_byte,
+      TX_DONE   => tx_done,
+      TX_ACTIVE => tx_active
+    );
 
-          when STATE_1 =>
-            tx_dv <= '0';
-            if tx_done = '1' then
-              tx_byte <= tx_low;  -- Prepare low byte
-              tx_dv <= '1';
-              state <= STATE_2;
-            end if;
+  -- -- Byte splitting logic (same as Verilog)
+  -- tx_high <= adc_data_latched(11 downto 4);
+  -- tx_low  <= adc_data_latched(3 downto 0) & "0000";
 
-          when STATE_2 =>
-            tx_dv <= '0';
-            if tx_done = '1' then
-              state <= STATE_3;
-            end if;
+  -- process(CLK_50)
+  -- begin
+  --   if rising_edge(CLK_50) then
+  --     if RESET = '0' then
+  --       state         <= STATE_0;
+  --       tx_dv         <= '0';
+  --       tx_byte       <= x"00";
+  --       interbyte_counter <= 0;
+  --     else
+  --       case state is
+  --         when STATE_0 =>
+  --           if tx_active = '0' then
+  --             adc_data_latched <= adc_ch0;  -- Latch current ADC data
+  --             tx_byte <= tx_high;           -- Prepare high byte
+  --             tx_dv <= '1';
+  --             state <= STATE_1;
+  --           end if;
 
-          when STATE_3 =>
-            if interbyte_counter < 2500 then  -- ~50 us at 50MHz (matches Verilog timing)
-              interbyte_counter <= interbyte_counter + 1;
-            else
-              interbyte_counter <= 0;
-              state <= STATE_0;
-            end if;
+  --         when STATE_1 =>
+  --           tx_dv <= '0';
+  --           if tx_done = '1' then
+  --             tx_byte <= tx_low;  -- Prepare low byte
+  --             tx_dv <= '1';
+  --             state <= STATE_2;
+  --           end if;
 
-          when others =>  -- safety fallback
-            state <= STATE_0;
-        end case;
-      end if;
-    end if;
-  end process;
+  --         when STATE_2 =>
+  --           tx_dv <= '0';
+  --           if tx_done = '1' then
+  --             state <= STATE_3;
+  --           end if;
+
+  --         when STATE_3 =>
+  --           if interbyte_counter < 2500 then  -- ~50 us at 50MHz (matches Verilog timing)
+  --             interbyte_counter <= interbyte_counter + 1;
+  --           else
+  --             interbyte_counter <= 0;
+  --             state <= STATE_0;
+  --           end if;
+
+  --         when others =>  -- safety fallback
+  --           state <= STATE_0;
+  --       end case;
+  --     end if;
+  --   end if;
+  -- end process;
 end RTL;
